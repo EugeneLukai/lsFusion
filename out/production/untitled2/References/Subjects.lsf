@@ -1,0 +1,27 @@
+MODULE Subjects;
+
+REQUIRE Main;
+
+CLASS Subjects 'Предметы';
+name 'Наименование' = DATA STRING[100] (Subjects) NONULL;
+shortName 'Краткое наименование' = DATA STRING[20] (Subjects);
+uniqueSubject = GROUP AGGR Subjects s BY name(s), shortName(s);
+
+FORM viewSubjects 'Предметы'
+    OBJECTS s = Subjects
+    PROPERTIES (s) READONLY name, shortName
+    PROPERTIES (s) NEWSESSION NEW, EDIT, DELETE
+;
+
+FORM editSubjects 'Редактирование Предмета'
+    OBJECTS s = Subjects PANEL
+    PROPERTIES (s) name, shortName
+    EDIT Subjects OBJECT s
+;
+
+NAVIGATOR {
+    results{
+        NEW FORM viewSubjects;
+    }
+}
+

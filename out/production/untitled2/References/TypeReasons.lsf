@@ -1,0 +1,19 @@
+MODULE TypeReasons;
+
+REQUIRE Main;
+
+CLASS TypeReasons 'Тип причины отсутствия'{
+    respectful 'Уважительная',
+    disrespectful 'Неуважительная'
+}
+
+FORM viewTypeReasons 'Типы причин'
+    OBJECTS tr = TypeReasons
+    PROPERTIES (tr) READONLY caption
+;
+
+NAVIGATOR {
+    references{
+        NEW FORM viewTypeReasons;
+    }
+}

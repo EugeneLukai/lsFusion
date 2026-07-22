@@ -1,0 +1,85 @@
+MODULE Result;
+
+REQUIRE ResultType, UO, Player,Subjects, Reasons, Main, Time;
+
+CLASS Result 'Результаты';
+result 'Результат' = DATA INTEGER (Result) NONULL ;
+typeStage 'Тип Этапа' = DATA ResultType(Result) NONULL;
+nameResultType 'Тип Этапа'(Result r) = caption(typeStage(r));
+date 'Дата' = DATA DATE (Result) NONULL;
+year 'Год' (Result r) = YEAR (date(r));
+uo 'УО'= DATA UO(Result) NONULL;
+resultUOName 'Наименование'(Result r) = nameUO(uo(r));
+
+player 'Участник'= DATA Player(Result) NONULL;
+playerFullName 'ФИО' (Result r) = fullName(player(r));
+
+subject 'Предмет' = DATA Subjects(Result) NONULL;
+subjectName 'Предмет'(Result r) = name(subject(r));
+
+reason 'Причина отсутствия' = DATA Reasons (Result);
+reasonName 'Причина'(Result r) = name(reason(r));
+
+count = GROUP SUM 1 BY player(Result r), year(r);
+countCE = GROUP SUM 1 BY player(Result r), year(r), typeStage(r);
+
+CONSTRAINT typeStage(Result r) == ResultType.RD AND NOT reason(r) MESSAGE 'Для РД необходимо указать причину отсутствия!';
+CONSTRAINT count(Player player, YEAR year) >= 3 MESSAGE 'Нельзя сдавать больше 3 экзаменов в дом';
+CONSTRAINT countCE(Player player, YEAR year, ResultType.CE) >= 2 MESSAGE 'Нельзя сдавать больше 2 ЦЭ';
+CONSTRAINT date(Result r) > currentDate() MESSAGE 'Недопустипая дата';
+
+uniqueResult = GROUP AGGR Result r BY subject(r), year(r), player(r);
+CONSTRAINT result(Result r) >= 100 OR result(r) <= 0 MESSAGE 'Недопустимое количество баллов';
+
+filterUO = DATA UO();
+nameFilteerUO 'УО'= nameUO(filterUO());
+
+filterPlayer = DATA Player();
+nameFilterPlayer 'Участник' = fullName(filterPlayer());
+
+filterDate = DATA DATE;
+dateFilterDate 'Дата' = DATE(filterDate());
+FORM viewResult 'Результаты'
+
+    PROPERTIES () nameFilteerUO, nameFilterPlayer, dateFilterDate
+
+    OBJECTS r = Result
+    FILTERS uo(r) = filterUO() OR NOT filterUO()
+    FILTERS date(r) = filterDate() OR NOT filterDate()
+    FILTERS player(r) = filterPlayer() OR NOT filterPlayer()
+    PROPERTIES (r) READONLY result, date, nameResultType, resultUOName, playerFullName, reasonName SHOWIF ResultType.RD == typeStage(r), subjectName
+    PROPERTIES (r) NEWSESSION NEW, EDIT, DELETE
+
+;
+
+FORM editResult 'Редактирование Результатов'
+    OBJECTS r = Result PANEL
+    PROPERTIES (r) result, date, nameResultType, resultUOName, playerFullName, reasonName SHOWIF ResultType.RD == typeStage(r), subjectName
+    EDIT Result OBJECT r
+;
+
+DESIGN editResult{
+    OBJECTS {
+        NEW cntUO{
+            horizontal = FALSE ;
+            caption = 'Данные о результате';
+            MOVE PROPERTY (playerFullName(r));
+            MOVE PROPERTY (subjectName(r));
+            MOVE PROPERTY (result(r));
+            MOVE PROPERTY (date(r));
+            MOVE PROPERTY (resultUOName(r));
+        }
+        NEW cntResultType{
+            horizontal = TRUE ;
+            caption = 'Тип Этапа';
+            MOVE PROPERTY (nameResultType(r));
+            MOVE PROPERTY (reasonName(r));
+        }
+    }
+}
+
+NAVIGATOR {
+    results{
+        NEW FORM viewResult;
+    }
+}

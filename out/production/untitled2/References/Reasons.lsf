@@ -1,0 +1,28 @@
+MODULE Reasons;
+
+REQUIRE TypeReasons, Main;
+
+CLASS Reasons 'Причины отсутствия на РД';
+name 'Наименование' = DATA STRING[50] (Reasons) NONULL;
+typeResons 'Тип причины' = DATA TypeReasons (Reasons) NONULL;
+typeResonsName 'Наименованиие типа причины' (Reasons r) = caption(typeResons(r));
+uniqueReasons = GROUP AGGR Reasons r BY name(r), typeResons(r);
+
+FORM viewReasons 'Причины отсутствия на РД'
+    OBJECTS r = Reasons
+    PROPERTIES (r) READONLY name, typeResonsName
+    PROPERTIES (r) NEWSESSION NEW, EDIT, DELETE
+;
+
+FORM editReasons 'Редактирование Причин'
+    OBJECTS r = Reasons PANEL
+    PROPERTIES (r) name, typeResonsName
+    EDIT Reasons OBJECT r
+;
+
+NAVIGATOR {
+    results{
+        NEW FORM viewReasons;
+    }
+
+}

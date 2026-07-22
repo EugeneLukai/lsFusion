@@ -1,0 +1,45 @@
+MODULE UO;
+
+REQUIRE Region, Main;
+
+CLASS UO 'Учреждение образования';
+codeUO 'Код УО' = DATA STRING[10] (UO) NONULL;
+nameUO 'Наименование УО'= DATA STRING[100] (UO) NONULL;
+region 'Область' = DATA Region(UO) NONULL;
+nameRegion 'Наименование области' (UO u) = caption(region(u));
+uniqueUO = GROUP AGGR UO uo BY codeUO(uo), nameUO(uo), region(uo);
+uniqueCodeUO = GROUP AGGR UO uo BY codeUO(uo);
+
+FORM viewUO 'УО'
+    OBJECTS u = UO
+    PROPERTIES (u) READONLY codeUO, nameUO, nameRegion
+    PROPERTIES (u) NEWSESSION NEW, EDIT, DELETE
+;
+
+FORM editUO 'Редактирование УО'
+    OBJECTS uo = UO PANEL
+    PROPERTIES (uo) codeUO, nameUO, nameRegion
+    EDIT UO OBJECT uo
+;
+
+DESIGN editUO{
+    OBJECTS {
+        NEW cntUO{
+            horizontal = TRUE ;
+            caption = 'УО';
+            MOVE PROPERTY (codeUO(uo));
+            MOVE PROPERTY (nameUO(uo));
+        }
+        NEW cntRegion{
+            horizontal = FALSE;
+            caption = 'Область';
+            MOVE PROPERTY (nameRegion(uo));
+        }
+    }
+}
+
+NAVIGATOR {
+    results{
+        NEW FORM viewUO;
+    }
+}

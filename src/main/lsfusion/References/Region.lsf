@@ -1,0 +1,24 @@
+MODULE Region;
+
+REQUIRE Main;
+
+CLASS Region 'Область'{
+    minsk 'Минск',
+    minskRegion 'Минская область',
+    mogilevRegion 'Могилевская область',
+    vitebskRegion 'Витебская область',
+    gomelRegion 'Гомельская область',
+    grodnoRegion 'Гродненская область',
+    brestRegion 'Брестская область'
+}
+
+FORM viewRegions 'Области'
+    OBJECTS r = Region
+    PROPERTIES (r) READONLY caption
+;
+
+NAVIGATOR {
+    references{
+        NEW FORM viewRegions;
+    }
+}

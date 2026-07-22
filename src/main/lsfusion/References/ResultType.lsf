@@ -1,0 +1,19 @@
+MODULE ResultType;
+
+REQUIRE Main;
+
+CLASS ResultType 'Тип результата'{
+    CT 'ЦТ',
+    CE 'ЦЭ',
+    RD 'РД'
+}
+FORM viewResultTypes 'Типы результатов'
+    OBJECTS rt = ResultType
+    PROPERTIES (rt) READONLY caption
+;
+
+NAVIGATOR {
+    references{
+        NEW FORM viewResultTypes;
+    }
+}

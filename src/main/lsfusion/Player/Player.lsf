@@ -1,0 +1,46 @@
+MODULE Player;
+
+REQUIRE Main;
+
+CLASS Player 'Участники';
+name 'Имя'= DATA STRING[50] (Player) NONULL;
+lastName 'Фамилия' = DATA STRING[50] (Player) NONULL;
+middleName 'Отчество' = DATA STRING[50] (Player);
+pasportNumber 'Идентификационный номер' = DATA STRING[50] (Player) NONULL;
+fullName 'ФИО' (Player p) = CONCAT ' ', lastName(p), name(p), middleName(p);
+unique = GROUP AGGR Player p BY pasportNumber(p);
+
+FORM viewPlayer 'Участники'
+    OBJECTS p = Player
+    PROPERTIES (p) READONLY name, lastName, middleName, pasportNumber
+    PROPERTIES (p) NEWSESSION NEW, EDIT, DELETE
+;
+
+FORM editPlayer 'Редактирование Участника'
+    OBJECTS p = Player PANEL
+    PROPERTIES (p) name, lastName, middleName, pasportNumber
+    EDIT Player OBJECT p
+;
+
+DESIGN editPlayer{
+    OBJECTS {
+        NEW cntFIO{
+            horizontal = TRUE ;
+            caption = 'ФИО';
+            MOVE PROPERTY (lastName(p));
+            MOVE PROPERTY (name(p));
+            MOVE PROPERTY (middleName(p));
+        }
+        NEW cntPasport{
+            horizontal = FALSE;
+            caption = 'Идентификационный номер';
+            MOVE PROPERTY (pasportNumber(p));
+        }
+    }
+}
+
+NAVIGATOR {
+    results{
+        NEW FORM viewPlayer;
+    }
+}

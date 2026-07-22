@@ -1,0 +1,9 @@
+MODULE Main;
+
+NAVIGATOR {
+    NEW FOLDER rikz 'Результаты РИКЗ' WINDOW toolbar FIRST {
+        NEW FOLDER results 'Результаты';
+        NEW FOLDER references 'Справочники';
+    }
+}
+
